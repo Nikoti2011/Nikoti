@@ -463,6 +463,83 @@
       60%  { opacity: 0.10; transform: scale(4); border-radius: 50%; }
       100% { opacity: 0;    transform: scale(6); border-radius: 50%; }
     }
+
+    /* ABOUT */
+    .about-card {
+      background: var(--card);
+      backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s;
+    }
+    .about-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.07);
+    }
+    .about-text {
+      font-size: 16px; line-height: 1.75; color: var(--fg);
+      font-weight: 300; max-width: 560px;
+    }
+    .about-text strong { font-weight: 500; }
+    .about-text .highlight {
+      color: var(--purple); font-weight: 400;
+    }
+    .about-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+    .about-meta {
+      display: flex; flex-wrap: wrap; gap: 20px;
+    }
+    .about-meta-item {
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .about-meta-item span:first-child {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    }
+    .about-meta-item span:last-child {
+      font-size: 13px; font-weight: 400; color: var(--fg);
+    }
+
+    /* SHARE BUTTON */
+    .share-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 14px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 980px;
+      font-size: 12px; font-weight: 400;
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, transform 0.2s, background 0.2s;
+      position: relative;
+    }
+    .share-btn:hover {
+      border-color: var(--purple);
+      color: var(--purple);
+      background: var(--purple-soft);
+      transform: scale(1.04);
+    }
+    .share-btn svg { width: 12px; height: 12px; }
+    .share-tooltip {
+      position: absolute; bottom: calc(100% + 8px); left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: var(--fg); color: var(--bg);
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      padding: 5px 10px; border-radius: 7px;
+      white-space: nowrap; opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .share-tooltip::after {
+      content: ''; position: absolute; top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent; border-top-color: var(--fg);
+    }
+    .share-tooltip.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { to { opacity: 1; } }
 
@@ -521,6 +598,7 @@
   <nav id="navbar">
     <a href="#" class="nav-logo">nikoti</a>
     <ul class="nav-links">
+      <li><a href="#about">About</a></li>
       <li><a href="#skills">Skills</a></li>
       <li><a href="#projects">Projects</a></li>
       <li><a href="#videos">Videos</a></li>
@@ -569,6 +647,36 @@
       <div class="scroll-line"></div>
     </div>
   </section>
+
+  <!-- ABOUT -->
+  <div class="full-divider"></div>
+  <div class="section" id="about">
+    <p class="section-label reveal">Who I am</p>
+    <h2 class="section-title reveal reveal-d1">About</h2>
+    <div class="about-card reveal reveal-d2">
+      <p class="about-text">
+        I'm <strong>Nikoti</strong> — a self-taught developer and maker still in middle school, about to head into high school.
+        I got into coding on my own, mostly through <span class="highlight">building Roblox games</span>, and it snowballed from there into web dev, Python, Java, and more.
+        Outside of code, I do <span class="highlight">3D printing and design</span>, and this year I'm building a <span class="highlight">competition robot</span> with my school's FRC team.
+        I just like making things — and eventually I want to turn that into a career in tech.
+      </p>
+      <hr class="about-divider">
+      <div class="about-meta">
+        <div class="about-meta-item">
+          <span>Based in</span>
+          <span>Medellín, CO</span>
+        </div>
+        <div class="about-meta-item">
+          <span>Status</span>
+          <span>Student · Open to collabs</span>
+        </div>
+        <div class="about-meta-item">
+          <span>FRC Team</span>
+          <span>7403 · LBL</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- SKILLS -->
   <div class="full-divider"></div>
@@ -656,6 +764,17 @@
   <div class="footer-wrap">
     <footer>
       <p>© 2025 Nikoti</p>
+      <div style="position:relative;">
+        <button class="share-btn" onclick="sharesite()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          share
+        </button>
+        <div class="share-tooltip" id="shareTooltip">link copied!</div>
+      </div>
       <div class="footer-links">
         <a href="https://github.com/Nikoti2011" target="_blank">GitHub</a>
         <a href="#" onclick="copyDiscord(); return false;">Discord</a>
@@ -842,6 +961,7 @@
 
 
     // dark mode handled in <head>
+    // Share
 
   </script>
 </body>
