@@ -12,18 +12,22 @@
 
     :root {
       --bg: #f5f5f7;
+      --bg-gradient: linear-gradient(160deg, #ffffff 0%, #f5f5f7 40%, #ede9fe 82%, #ddd6fe 100%);
       --fg: #1d1d1f;
       --muted: #86868b;
       --border: #d2d2d7;
       --card: rgba(255,255,255,0.85);
       --tag-bg: #e8e8ed;
       --blur: blur(20px);
+      --purple: #7c3aed;
+      --purple-soft: rgba(124,58,237,0.08);
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg);
+      background: var(--bg-gradient);
+      background-attachment: fixed;
       color: var(--fg);
       font-family: 'Geist', -apple-system, sans-serif;
       font-weight: 300;
@@ -57,8 +61,8 @@
     }
     body.hovering .cursor-outer {
       width: 56px; height: 56px;
-      background: rgba(0,0,0,0.05);
-      border-color: transparent;
+      background: rgba(124,58,237,0.07);
+      border-color: rgba(124,58,237,0.2);
     }
     @media (hover: none) { .cursor-outer, .cursor-inner { display: none; } }
 
@@ -67,7 +71,7 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       padding: 0 48px; height: 52px;
       display: flex; align-items: center; justify-content: space-between;
-      background: rgba(245,245,247,0.72);
+      background: rgba(250,249,255,0.75);
       backdrop-filter: var(--blur);
       -webkit-backdrop-filter: var(--blur);
       border-bottom: 1px solid transparent;
@@ -77,7 +81,9 @@
     .nav-logo {
       font-size: 15px; font-weight: 500;
       letter-spacing: -0.02em; color: var(--fg); text-decoration: none;
+      transition: color 0.2s;
     }
+    .nav-logo:hover { color: var(--purple); }
     .nav-links { display: flex; gap: 28px; list-style: none; }
     .nav-links a {
       font-size: 13px; font-weight: 400; color: var(--muted);
@@ -106,7 +112,7 @@
     }
     .orb-2 {
       width: 440px; height: 440px;
-      background: radial-gradient(circle, rgba(120,80,255,0.07) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%);
       bottom: 5%; right: -8%;
       animation: orbFade 1.8s ease 0.4s forwards, drift2 16s ease-in-out 2s infinite alternate;
     }
@@ -204,7 +210,7 @@
     }
     .scroll-line {
       width: 1px; height: 34px;
-      background: linear-gradient(to bottom, var(--border), transparent);
+      background: linear-gradient(to bottom, var(--purple), transparent);
       animation: scrollPulse 2.2s ease-in-out 2.2s infinite;
     }
     @keyframes scrollPulse {
@@ -220,7 +226,7 @@
     .section-label {
       font-family: 'DM Mono', monospace; font-size: 11px;
       font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 14px;
+      color: var(--purple); margin-bottom: 14px;
     }
     .section-title {
       font-size: clamp(34px, 5vw, 52px);
@@ -285,7 +291,7 @@
     .project-name { font-size: 16px; font-weight: 500; letter-spacing: -0.02em; }
     .project-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
     .project-tag {
-      background: var(--tag-bg); color: var(--muted);
+      background: var(--purple-soft); color: var(--purple);
       font-family: 'DM Mono', monospace; font-size: 10px;
       padding: 4px 9px; border-radius: 6px; align-self: flex-start;
     }
@@ -309,63 +315,15 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-
-    /* ROBLOX GRID */
-    .roblox-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
-    }
-    @media (max-width: 680px) { .roblox-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 400px) { .roblox-grid { grid-template-columns: 1fr; } }
-
-    .roblox-card {
-      background: var(--card);
-      backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-      border: 1px solid var(--border); border-radius: 16px;
-      text-decoration: none; color: inherit;
-      overflow: hidden; display: flex; flex-direction: column;
-      transition: transform 0.38s cubic-bezier(0.16,1,0.3,1), box-shadow 0.38s, border-color 0.2s;
-      position: relative;
-    }
-    .roblox-card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 24px 48px rgba(0,0,0,0.11), 0 4px 12px rgba(0,0,0,0.07);
-      border-color: rgba(0,0,0,0.08);
-    }
-    .roblox-card:active { transform: translateY(-2px) scale(1.005); }
-
-    .roblox-thumb {
-      width: 100%; aspect-ratio: 1 / 1;
-      background: var(--tag-bg);
-      overflow: hidden; position: relative;
-    }
-    .roblox-thumb img {
-      width: 100%; height: 100%; object-fit: cover;
-      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
-      display: block;
-    }
-    .roblox-card:hover .roblox-thumb img { transform: scale(1.06); }
-
-    .roblox-badge {
-      position: absolute; bottom: 8px; left: 8px;
-      background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
-      color: #fff; font-family: 'DM Mono', monospace; font-size: 10px;
-      padding: 3px 8px; border-radius: 6px;
-      display: flex; align-items: center; gap: 5px;
-    }
-    .roblox-badge svg { width: 9px; height: 9px; fill: #4ade80; }
-
-    .roblox-info { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
-    .roblox-name { font-size: 13px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.3; }
-    .roblox-desc { font-size: 11.5px; color: var(--muted); line-height: 1.5; flex: 1;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .roblox-meta { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
-    .roblox-visits { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+    /* CONTENT CARDS */
+    .content-cards { display: flex; flex-direction: column; gap: 12px; }
 
     /* VIDEO */
     .video-card {
       background: var(--card); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
       border: 1px solid var(--border); border-radius: 20px;
       padding: 32px; display: flex; align-items: center; gap: 20px;
+      text-decoration: none; color: inherit;
       transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s;
     }
     .video-card:hover {
@@ -377,6 +335,8 @@
       background: var(--tag-bg); display: flex; align-items: center; justify-content: center;
     }
     .video-icon svg { width: 22px; height: 22px; stroke: var(--muted); fill: none; stroke-width: 1.6; }
+    .roblox-icon { background: var(--purple-soft) !important; }
+    .roblox-icon svg { stroke: var(--purple) !important; }
     .video-text strong { display: block; font-size: 15px; font-weight: 500; margin-bottom: 5px; letter-spacing: -0.01em; }
     .video-text p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
@@ -421,7 +381,6 @@
     <a href="#" class="nav-logo">nikoti</a>
     <ul class="nav-links">
       <li><a href="#projects">Projects</a></li>
-      <li><a href="#roblox">Games</a></li>
       <li><a href="#videos">Videos</a></li>
       <li><a href="https://github.com/Nikoti2011" target="_blank">GitHub ↗</a></li>
     </ul>
@@ -468,31 +427,38 @@
     <h2 class="section-title reveal reveal-d1">Projects</h2>
     <div class="projects-grid" id="projects-grid"></div>
   </div>
-
-  <!-- ROBLOX -->
-  <div class="full-divider"></div>
-  <div class="section" id="roblox">
-    <p class="section-label reveal">Game Studio</p>
-    <h2 class="section-title reveal reveal-d1">Roblox Games</h2>
-    <div class="roblox-grid" id="roblox-grid"></div>
-  </div>
-
   <!-- VIDEOS -->
   <div class="full-divider"></div>
   <div class="section" id="videos">
     <p class="section-label reveal">Content</p>
-    <h2 class="section-title reveal reveal-d1">Videos</h2>
-    <div class="reveal reveal-d2">
-      <div class="video-card">
-        <div class="video-icon">
-          <svg viewBox="0 0 24 24">
-            <polygon points="23 7 16 12 23 17 23 7"/>
-            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-          </svg>
-        </div>
-        <div class="video-text">
-          <strong>Not posting right now.</strong>
-          <p>Some old Minecraft clips and random stuff on YouTube — nothing worth linking yet. Maybe something new eventually.</p>
+    <h2 class="section-title reveal reveal-d1">Games &amp; Videos</h2>
+    <div class="content-cards">
+      <div class="reveal reveal-d1">
+        <a class="video-card" href="https://www.roblox.com/users/4645504979/profile" target="_blank" rel="noopener">
+          <div class="video-icon roblox-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+          </div>
+          <div class="video-text">
+            <strong>Roblox Games ↗</strong>
+            <p>I make games on Roblox under my own studio. Check out my profile to see everything I've built.</p>
+          </div>
+        </a>
+      </div>
+      <div class="reveal reveal-d2">
+        <div class="video-card">
+          <div class="video-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <polygon points="23 7 16 12 23 17 23 7"/>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+          </div>
+          <div class="video-text">
+            <strong>Not posting right now.</strong>
+            <p>Some old Minecraft clips and random stuff on YouTube — nothing worth linking yet.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -687,103 +653,6 @@
     }
 
     loadProjects();
-
-    // ---- Roblox Games ----
-    const ROBLOX_USER_ID = '4645504979';
-    const rbxGrid = document.getElementById('roblox-grid');
-
-    function formatVisits(n) {
-      if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-      if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-      return n.toString();
-    }
-
-    function renderRobloxSkeleton(count = 6) {
-      rbxGrid.innerHTML = '';
-      for (let i = 0; i < count; i++) {
-        const sk = document.createElement('div');
-        sk.className = 'roblox-card skeleton-card';
-        sk.innerHTML = `
-          <div class="roblox-thumb" style="background:var(--tag-bg);">
-            <div class="sk-box" style="width:100%;height:100%;border-radius:0"></div>
-          </div>
-          <div class="roblox-info">
-            <div class="sk-box" style="width:70%;height:12px;border-radius:5px;margin-bottom:6px"></div>
-            <div class="sk-box" style="width:90%;height:10px;border-radius:5px;margin-bottom:4px"></div>
-            <div class="sk-box" style="width:60%;height:10px;border-radius:5px"></div>
-          </div>
-        `;
-        rbxGrid.appendChild(sk);
-      }
-    }
-
-    async function loadRobloxGames() {
-      renderRobloxSkeleton(6);
-      try {
-        // 1. Get user's games
-        const gamesRes = await fetch(`https://games.roblox.com/v2/users/${ROBLOX_USER_ID}/games?limit=50&sortOrder=Asc`);
-        if (!gamesRes.ok) throw new Error('Roblox API error');
-        const gamesData = await gamesRes.json();
-        const games = gamesData.data || [];
-
-        if (games.length === 0) {
-          rbxGrid.innerHTML = `<div class="empty-state reveal" style="grid-column:1/-1"><p>No public games yet.</p></div>`;
-          revealObserver.observe(rbxGrid.firstChild);
-          return;
-        }
-
-        // 2. Get thumbnails for all games in one batch call
-        const universeIds = games.map(g => g.id).join(',');
-        const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeIds}&returnPolicy=PlaceHolder&size=512x512&format=Png&isCircular=false`);
-        const thumbData = thumbRes.ok ? await thumbRes.json() : { data: [] };
-        const thumbMap = {};
-        (thumbData.data || []).forEach(t => { thumbMap[t.targetId] = t.imageUrl; });
-
-        rbxGrid.innerHTML = '';
-
-        games.forEach((game, i) => {
-          const thumb = thumbMap[game.id] || '';
-          const visits = formatVisits(game.visits || 0);
-          const playing = game.playing || 0;
-          const desc = game.description ? game.description.trim().slice(0, 120) : 'A Roblox experience.';
-
-          const card = document.createElement('a');
-          card.className = 'roblox-card reveal';
-          card.style.transitionDelay = (i * 0.07) + 's';
-          card.href = `https://www.roblox.com/games/${game.rootPlace?.id || game.id}`;
-          card.target = '_blank';
-          card.rel = 'noopener';
-          card.innerHTML = `
-            <div class="roblox-thumb">
-              ${thumb ? `<img src="${thumb}" alt="${escHtml(game.name)}" loading="lazy">` : ''}
-              ${playing > 0 ? `
-              <div class="roblox-badge">
-                <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
-                ${playing} playing
-              </div>` : ''}
-            </div>
-            <div class="roblox-info">
-              <div class="roblox-name">${escHtml(game.name)}</div>
-              <div class="roblox-desc">${escHtml(desc)}</div>
-              <div class="roblox-meta">
-                <span class="roblox-visits">${visits} visits</span>
-              </div>
-            </div>
-          `;
-
-          rbxGrid.appendChild(card);
-          revealObserver.observe(card);
-          card.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
-          card.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-        });
-
-      } catch (err) {
-        rbxGrid.innerHTML = `<div class="empty-state reveal" style="grid-column:1/-1"><p>Couldn't load games right now — <a href="https://www.roblox.com/users/${ROBLOX_USER_ID}/profile" target="_blank">view on Roblox</a>.</p></div>`;
-        revealObserver.observe(rbxGrid.firstChild);
-      }
-    }
-
-    loadRobloxGames();
 
   </script>
 </body>
