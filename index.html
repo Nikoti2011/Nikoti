@@ -588,6 +588,19 @@
     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', savedTheme);
   </script>
+  <script>
+    function sharesite() {
+      const url = window.location.href.split('?')[0];
+      navigator.clipboard.writeText(url).catch(() => {});
+      const tip = document.getElementById('shareTooltip');
+      if (tip) { tip.classList.add('show'); setTimeout(() => tip.classList.remove('show'), 2200); }
+    }
+    function copyDiscord() {
+      navigator.clipboard.writeText('nikoti2011').catch(() => {});
+      const tip = document.getElementById('dcTooltip');
+      if (tip) { tip.classList.add('show'); setTimeout(() => tip.classList.remove('show'), 2200); }
+    }
+  </script>
 </head>
 <body>
 
