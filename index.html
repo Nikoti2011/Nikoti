@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nikoti</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Geist:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f5f7;
+      --fg: #1d1d1f;
+      --muted: #86868b;
+      --border: #d2d2d7;
+      --card: rgba(255,255,255,0.85);
+      --tag-bg: #e8e8ed;
+      --blur: blur(20px);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Geist', -apple-system, sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* NOISE */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000;
+    }
+
+    /* CURSOR */
+    .cursor-outer {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(0,0,0,0.22);
+      border-radius: 50%;
+      position: fixed; pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s;
+      mix-blend-mode: multiply;
+    }
+    .cursor-inner {
+      width: 5px; height: 5px;
+      background: var(--fg); border-radius: 50%;
+      position: fixed; pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+    }
+    body.hovering .cursor-outer {
+      width: 56px; height: 56px;
+      background: rgba(0,0,0,0.05);
+      border-color: transparent;
+    }
+    @media (hover: none) { .cursor-outer, .cursor-inner { display: none; } }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0 48px; height: 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(245,245,247,0.72);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.4s;
+    }
+    nav.scrolled { border-bottom-color: var(--border); }
+    .nav-logo {
+      font-size: 15px; font-weight: 500;
+      letter-spacing: -0.02em; color: var(--fg); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      font-size: 13px; font-weight: 400; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--fg); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 52px 24px 0;
+      position: relative; overflow: hidden;
+    }
+
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(80px); opacity: 0; pointer-events: none;
+    }
+    .orb-1 {
+      width: 560px; height: 560px;
+      background: radial-gradient(circle, rgba(0,120,250,0.09) 0%, transparent 70%);
+      top: 5%; left: -12%;
+      animation: orbFade 1.8s ease 0.2s forwards, drift1 14s ease-in-out 2s infinite alternate;
+    }
+    .orb-2 {
+      width: 440px; height: 440px;
+      background: radial-gradient(circle, rgba(120,80,255,0.07) 0%, transparent 70%);
+      bottom: 5%; right: -8%;
+      animation: orbFade 1.8s ease 0.4s forwards, drift2 16s ease-in-out 2s infinite alternate;
+    }
+    .orb-3 {
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(0,200,140,0.05) 0%, transparent 70%);
+      top: 55%; left: 48%;
+      animation: orbFade 1.8s ease 0.6s forwards, drift3 11s ease-in-out 2s infinite alternate;
+    }
+
+    @keyframes orbFade { to { opacity: 1; } }
+    @keyframes drift1 { to { transform: translate(50px, 35px); } }
+    @keyframes drift2 { to { transform: translate(-35px, -25px); } }
+    @keyframes drift3 { to { transform: translate(25px, -45px); } }
+
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 22px;
+      opacity: 0; transform: translateY(18px);
+      animation: slideUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+    }
+    .hero-name {
+      font-size: clamp(72px, 14vw, 128px);
+      font-weight: 600; letter-spacing: -0.048em; line-height: 0.9;
+      color: var(--fg); margin-bottom: 28px;
+      opacity: 0; transform: translateY(32px);
+      animation: slideUp 1s cubic-bezier(0.16,1,0.3,1) 0.65s forwards;
+    }
+    .hero-sub {
+      font-size: clamp(17px, 2.4vw, 22px); font-weight: 300;
+      color: var(--muted); max-width: 460px; line-height: 1.5;
+      margin-bottom: 48px;
+      opacity: 0; transform: translateY(24px);
+      animation: slideUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.82s forwards;
+    }
+    .hero-actions {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      opacity: 0; transform: translateY(18px);
+      animation: slideUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.98s forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 12px 22px; background: var(--fg); color: var(--bg);
+      font-size: 14px; font-weight: 400; text-decoration: none;
+      border-radius: 980px; border: none; cursor: pointer; font-family: inherit;
+      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s, background 0.2s;
+    }
+    .btn-primary:hover {
+      background: #2d2d2f; transform: scale(1.04);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 12px 22px; background: transparent; color: var(--fg);
+      font-size: 14px; font-weight: 400; text-decoration: none;
+      border-radius: 980px; border: 1.5px solid var(--border);
+      cursor: pointer; font-family: inherit;
+      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), border-color 0.2s, box-shadow 0.25s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(0,0,0,0.4); transform: scale(1.04);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+    }
+    .btn-secondary:active { transform: scale(0.98); }
+
+    .discord-tooltip {
+      position: absolute; bottom: calc(100% + 10px); left: 50%;
+      transform: translateX(-50%) translateY(6px);
+      background: var(--fg); color: var(--bg);
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      padding: 6px 12px; border-radius: 8px;
+      white-space: nowrap; opacity: 0; pointer-events: none;
+      transition: opacity 0.22s, transform 0.22s;
+    }
+    .discord-tooltip::after {
+      content: ''; position: absolute;
+      top: 100%; left: 50%; transform: translateX(-50%);
+      border: 5px solid transparent; border-top-color: var(--fg);
+    }
+    .discord-tooltip.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .hero-scroll {
+      position: absolute; bottom: 38px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      opacity: 0; animation: fadeIn 1s ease 2.2s forwards;
+    }
+    .hero-scroll span {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    }
+    .scroll-line {
+      width: 1px; height: 34px;
+      background: linear-gradient(to bottom, var(--border), transparent);
+      animation: scrollPulse 2.2s ease-in-out 2.2s infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity: 0.35; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.3); transform-origin: top; }
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 120px 24px;
+      max-width: 900px; margin: 0 auto;
+    }
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: clamp(34px, 5vw, 52px);
+      font-weight: 600; letter-spacing: -0.03em; line-height: 1.04;
+      margin-bottom: 52px; color: var(--fg);
+    }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0; transform: translateY(36px);
+      transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1 { transition-delay: 0.1s; }
+    .reveal-d2 { transition-delay: 0.2s; }
+    .reveal-d3 { transition-delay: 0.3s; }
+
+    /* PROJECTS */
+    .projects-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    @media (max-width: 580px) { .projects-grid { grid-template-columns: 1fr; } }
+
+    .project-card {
+      background: var(--card);
+      backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 28px; text-decoration: none; color: inherit;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: transform 0.38s cubic-bezier(0.16,1,0.3,1),
+                  box-shadow 0.38s cubic-bezier(0.16,1,0.3,1),
+                  border-color 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .project-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.55) 0%, transparent 55%);
+      opacity: 0; transition: opacity 0.35s; border-radius: inherit; pointer-events: none;
+    }
+    .project-card:hover {
+      transform: translateY(-7px) scale(1.015);
+      box-shadow: 0 28px 56px rgba(0,0,0,0.11), 0 4px 14px rgba(0,0,0,0.07);
+      border-color: rgba(0,0,0,0.08);
+    }
+    .project-card:hover::before { opacity: 1; }
+    .project-card:active { transform: translateY(-3px) scale(1.005); }
+
+    .project-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .project-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--tag-bg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .project-icon svg { width: 20px; height: 20px; stroke: var(--muted); fill: none; stroke-width: 1.6; }
+    .project-arrow {
+      font-size: 17px; color: var(--muted);
+      opacity: 0; transform: translate(-4px, 4px);
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    .project-card:hover .project-arrow { opacity: 1; transform: translate(0,0); }
+    .project-name { font-size: 16px; font-weight: 500; letter-spacing: -0.02em; }
+    .project-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+    .project-tag {
+      background: var(--tag-bg); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      padding: 4px 9px; border-radius: 6px; align-self: flex-start;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      background: var(--card); border: 1.5px dashed var(--border);
+      border-radius: 20px; padding: 56px 32px; text-align: center;
+    }
+    .empty-state p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .empty-state a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+
+    /* SKELETON */
+    .skeleton-card { pointer-events: none; }
+    .sk-box {
+      background: linear-gradient(90deg, var(--tag-bg) 25%, #e0e0e5 50%, var(--tag-bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ROBLOX GRID */
+    .roblox-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    }
+    @media (max-width: 680px) { .roblox-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 400px) { .roblox-grid { grid-template-columns: 1fr; } }
+
+    .roblox-card {
+      background: var(--card);
+      backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border); border-radius: 16px;
+      text-decoration: none; color: inherit;
+      overflow: hidden; display: flex; flex-direction: column;
+      transition: transform 0.38s cubic-bezier(0.16,1,0.3,1), box-shadow 0.38s, border-color 0.2s;
+      position: relative;
+    }
+    .roblox-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.11), 0 4px 12px rgba(0,0,0,0.07);
+      border-color: rgba(0,0,0,0.08);
+    }
+    .roblox-card:active { transform: translateY(-2px) scale(1.005); }
+
+    .roblox-thumb {
+      width: 100%; aspect-ratio: 1 / 1;
+      background: var(--tag-bg);
+      overflow: hidden; position: relative;
+    }
+    .roblox-thumb img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+      display: block;
+    }
+    .roblox-card:hover .roblox-thumb img { transform: scale(1.06); }
+
+    .roblox-badge {
+      position: absolute; bottom: 8px; left: 8px;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+      color: #fff; font-family: 'DM Mono', monospace; font-size: 10px;
+      padding: 3px 8px; border-radius: 6px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .roblox-badge svg { width: 9px; height: 9px; fill: #4ade80; }
+
+    .roblox-info { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
+    .roblox-name { font-size: 13px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.3; }
+    .roblox-desc { font-size: 11.5px; color: var(--muted); line-height: 1.5; flex: 1;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .roblox-meta { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
+    .roblox-visits { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+
+    /* VIDEO */
+    .video-card {
+      background: var(--card); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 32px; display: flex; align-items: center; gap: 20px;
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s;
+    }
+    .video-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.09);
+    }
+    .video-icon {
+      width: 52px; height: 52px; flex-shrink: 0; border-radius: 14px;
+      background: var(--tag-bg); display: flex; align-items: center; justify-content: center;
+    }
+    .video-icon svg { width: 22px; height: 22px; stroke: var(--muted); fill: none; stroke-width: 1.6; }
+    .video-text strong { display: block; font-size: 15px; font-weight: 500; margin-bottom: 5px; letter-spacing: -0.01em; }
+    .video-text p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* FOOTER */
+    .footer-wrap {
+      max-width: 900px; margin: 0 auto; padding: 0 24px;
+    }
+    .full-divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(to right, transparent, var(--border) 15%, var(--border) 85%, transparent);
+    }
+    footer {
+      padding: 44px 0 52px;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; flex-wrap: wrap;
+    }
+    footer p { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a {
+      font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted);
+      text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--fg); }
+
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    @media (max-width: 480px) {
+      nav { padding: 0 20px; }
+      .nav-links { gap: 16px; }
+      .section { padding: 80px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor-outer" id="cursorOuter"></div>
+  <div class="cursor-inner" id="cursorInner"></div>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">nikoti</a>
+    <ul class="nav-links">
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#roblox">Games</a></li>
+      <li><a href="#videos">Videos</a></li>
+      <li><a href="https://github.com/Nikoti2011" target="_blank">GitHub ↗</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <p class="hero-eyebrow">Portfolio · Developer</p>
+    <h1 class="hero-name">Nikoti</h1>
+    <p class="hero-sub">Building things for the web — one project at a time.</p>
+
+    <div class="hero-actions">
+      <a class="btn-primary" href="https://github.com/Nikoti2011" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+        </svg>
+        View GitHub
+      </a>
+      <div style="position:relative;">
+        <button class="btn-secondary" onclick="copyDiscord()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+          Discord
+        </button>
+        <div class="discord-tooltip" id="dcTooltip">nikoti2011 · copied!</div>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <div class="full-divider"></div>
+  <div class="section" id="projects">
+    <p class="section-label reveal">Work</p>
+    <h2 class="section-title reveal reveal-d1">Projects</h2>
+    <div class="projects-grid" id="projects-grid"></div>
+  </div>
+
+  <!-- ROBLOX -->
+  <div class="full-divider"></div>
+  <div class="section" id="roblox">
+    <p class="section-label reveal">Game Studio</p>
+    <h2 class="section-title reveal reveal-d1">Roblox Games</h2>
+    <div class="roblox-grid" id="roblox-grid"></div>
+  </div>
+
+  <!-- VIDEOS -->
+  <div class="full-divider"></div>
+  <div class="section" id="videos">
+    <p class="section-label reveal">Content</p>
+    <h2 class="section-title reveal reveal-d1">Videos</h2>
+    <div class="reveal reveal-d2">
+      <div class="video-card">
+        <div class="video-icon">
+          <svg viewBox="0 0 24 24">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+        </div>
+        <div class="video-text">
+          <strong>Not posting right now.</strong>
+          <p>Some old Minecraft clips and random stuff on YouTube — nothing worth linking yet. Maybe something new eventually.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="full-divider"></div>
+  <div class="footer-wrap">
+    <footer>
+      <p>© 2025 Nikoti</p>
+      <div class="footer-links">
+        <a href="https://github.com/Nikoti2011" target="_blank">GitHub</a>
+        <a href="#" onclick="copyDiscord(); return false;">Discord</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // ---- Smooth lagging cursor ----
+    const co = document.getElementById('cursorOuter');
+    const ci = document.getElementById('cursorInner');
+    let ix = -200, iy = -200, ox = -200, oy = -200;
+
+    document.addEventListener('mousemove', e => { ix = e.clientX; iy = e.clientY; });
+
+    (function loop() {
+      ox += (ix - ox) * 0.11;
+      oy += (iy - oy) * 0.11;
+      co.style.left = ox + 'px'; co.style.top = oy + 'px';
+      ci.style.left = ix + 'px'; ci.style.top = iy + 'px';
+      requestAnimationFrame(loop);
+    })();
+
+    document.querySelectorAll('a, button, .project-card, .video-card').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+    });
+
+    // ---- Navbar on scroll ----
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // ---- Discord copy ----
+    function copyDiscord() {
+      navigator.clipboard.writeText('nikoti2011').catch(() => {});
+      const tip = document.getElementById('dcTooltip');
+      tip.classList.add('show');
+      setTimeout(() => tip.classList.remove('show'), 2200);
+    }
+
+    // ---- Scroll reveal ----
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ---- Projects — auto-fetched from GitHub ----
+    const GITHUB_USER = 'Nikoti2011';
+    // Repos to skip (forks, profile readme, etc.)
+    const SKIP_REPOS = [GITHUB_USER.toLowerCase(), `${GITHUB_USER.toLowerCase()}.github.io`];
+
+    const grid = document.getElementById('projects-grid');
+
+    function renderSkeleton(count = 4) {
+      grid.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const sk = document.createElement('div');
+        sk.className = 'project-card skeleton-card';
+        sk.innerHTML = `
+          <div class="sk-box" style="width:44px;height:44px;border-radius:12px;margin-bottom:12px"></div>
+          <div class="sk-box" style="width:55%;height:14px;border-radius:6px;margin-bottom:8px"></div>
+          <div class="sk-box" style="width:90%;height:11px;border-radius:6px;margin-bottom:5px"></div>
+          <div class="sk-box" style="width:70%;height:11px;border-radius:6px"></div>
+        `;
+        grid.appendChild(sk);
+      }
+    }
+
+    function renderCard(repo, desc, index) {
+      const card = document.createElement('a');
+      card.className = 'project-card reveal';
+      card.style.transitionDelay = (index * 0.09) + 's';
+      card.href = repo.html_url;
+      card.target = '_blank';
+      card.rel = 'noopener';
+
+      // pick language as tag
+      const tag = repo.language || null;
+
+      card.innerHTML = `
+        <div class="project-card-top">
+          <div class="project-icon">
+            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <span class="project-arrow">↗</span>
+        </div>
+        <div class="project-name">${repo.name}</div>
+        <div class="project-desc">${escHtml(desc)}</div>
+        ${tag ? `<span class="project-tag">${escHtml(tag)}</span>` : ''}
+      `;
+
+      grid.appendChild(card);
+      revealObserver.observe(card);
+      card.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+      card.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function parseReadme(raw) {
+      // Strip markdown: headings, bold/italic, links, code blocks, badges, images
+      return raw
+        .replace(/```[\s\S]*?```/g, '')      // code blocks
+        .replace(/`[^`]+`/g, '')              // inline code
+        .replace(/!\[.*?\]\(.*?\)/g, '')      // images
+        .replace(/\[.*?\]\(.*?\)/g, '$&'.replace(/\[(.+?)\]\(.+?\)/, '$1')) // links → text
+        .replace(/#{1,6}\s+/g, '')            // headings
+        .replace(/(\*\*|__)(.*?)\1/g, '$2')  // bold
+        .replace(/(\*|_)(.*?)\1/g, '$2')     // italic
+        .replace(/>\s?.+/g, '')              // blockquotes
+        .replace(/[-*+]\s/g, '')             // list bullets
+        .replace(/\n{2,}/g, ' ')             // collapse newlines
+        .replace(/\s{2,}/g, ' ')             // collapse spaces
+        .trim()
+        .slice(0, 160)
+        .replace(/\s+\S*$/, '') + '…';       // trim to last full word
+    }
+
+    async function fetchReadmeDesc(repoName) {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${repoName}/readme`, {
+          headers: { Accept: 'application/vnd.github.raw' }
+        });
+        if (!res.ok) return 'No description available.';
+        const text = await res.text();
+        const parsed = parseReadme(text);
+        return parsed.length > 5 ? parsed : 'No description available.';
+      } catch {
+        return 'No description available.';
+      }
+    }
+
+    async function loadProjects() {
+      renderSkeleton(4);
+      try {
+        const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=30`);
+        if (!res.ok) throw new Error('GitHub API error');
+        const repos = await res.json();
+
+        // Filter: not forked, not in skip list, not private
+        const filtered = repos.filter(r =>
+          !r.fork &&
+          !SKIP_REPOS.includes(r.name.toLowerCase())
+        );
+
+        grid.innerHTML = '';
+
+        if (filtered.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'empty-state reveal';
+          empty.innerHTML = `<p>No public projects yet — check back soon or visit <a href="https://github.com/${GITHUB_USER}" target="_blank">GitHub</a>.</p>`;
+          grid.appendChild(empty);
+          revealObserver.observe(empty);
+          return;
+        }
+
+        // Fetch descriptions (with README fallback) in parallel
+        await Promise.all(filtered.map(async (repo, i) => {
+          const desc = repo.description && repo.description.trim()
+            ? repo.description.trim()
+            : await fetchReadmeDesc(repo.name);
+          renderCard(repo, desc, i);
+        }));
+
+        // Re-observe newly added cards
+        document.querySelectorAll('.project-card.reveal:not(.visible)').forEach(el => revealObserver.observe(el));
+
+      } catch (err) {
+        grid.innerHTML = '';
+        const errEl = document.createElement('div');
+        errEl.className = 'empty-state reveal';
+        errEl.innerHTML = `<p>Couldn't load projects right now — visit <a href="https://github.com/${GITHUB_USER}" target="_blank">GitHub</a> directly.</p>`;
+        grid.appendChild(errEl);
+        revealObserver.observe(errEl);
+      }
+    }
+
+    loadProjects();
+
+    // ---- Roblox Games ----
+    const ROBLOX_USER_ID = '4645504979';
+    const rbxGrid = document.getElementById('roblox-grid');
+
+    function formatVisits(n) {
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+      return n.toString();
+    }
+
+    function renderRobloxSkeleton(count = 6) {
+      rbxGrid.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const sk = document.createElement('div');
+        sk.className = 'roblox-card skeleton-card';
+        sk.innerHTML = `
+          <div class="roblox-thumb" style="background:var(--tag-bg);">
+            <div class="sk-box" style="width:100%;height:100%;border-radius:0"></div>
+          </div>
+          <div class="roblox-info">
+            <div class="sk-box" style="width:70%;height:12px;border-radius:5px;margin-bottom:6px"></div>
+            <div class="sk-box" style="width:90%;height:10px;border-radius:5px;margin-bottom:4px"></div>
+            <div class="sk-box" style="width:60%;height:10px;border-radius:5px"></div>
+          </div>
+        `;
+        rbxGrid.appendChild(sk);
+      }
+    }
+
+    async function loadRobloxGames() {
+      renderRobloxSkeleton(6);
+      try {
+        // 1. Get user's games
+        const gamesRes = await fetch(`https://games.roblox.com/v2/users/${ROBLOX_USER_ID}/games?limit=50&sortOrder=Asc`);
+        if (!gamesRes.ok) throw new Error('Roblox API error');
+        const gamesData = await gamesRes.json();
+        const games = gamesData.data || [];
+
+        if (games.length === 0) {
+          rbxGrid.innerHTML = `<div class="empty-state reveal" style="grid-column:1/-1"><p>No public games yet.</p></div>`;
+          revealObserver.observe(rbxGrid.firstChild);
+          return;
+        }
+
+        // 2. Get thumbnails for all games in one batch call
+        const universeIds = games.map(g => g.id).join(',');
+        const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${universeIds}&returnPolicy=PlaceHolder&size=512x512&format=Png&isCircular=false`);
+        const thumbData = thumbRes.ok ? await thumbRes.json() : { data: [] };
+        const thumbMap = {};
+        (thumbData.data || []).forEach(t => { thumbMap[t.targetId] = t.imageUrl; });
+
+        rbxGrid.innerHTML = '';
+
+        games.forEach((game, i) => {
+          const thumb = thumbMap[game.id] || '';
+          const visits = formatVisits(game.visits || 0);
+          const playing = game.playing || 0;
+          const desc = game.description ? game.description.trim().slice(0, 120) : 'A Roblox experience.';
+
+          const card = document.createElement('a');
+          card.className = 'roblox-card reveal';
+          card.style.transitionDelay = (i * 0.07) + 's';
+          card.href = `https://www.roblox.com/games/${game.rootPlace?.id || game.id}`;
+          card.target = '_blank';
+          card.rel = 'noopener';
+          card.innerHTML = `
+            <div class="roblox-thumb">
+              ${thumb ? `<img src="${thumb}" alt="${escHtml(game.name)}" loading="lazy">` : ''}
+              ${playing > 0 ? `
+              <div class="roblox-badge">
+                <svg viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+                ${playing} playing
+              </div>` : ''}
+            </div>
+            <div class="roblox-info">
+              <div class="roblox-name">${escHtml(game.name)}</div>
+              <div class="roblox-desc">${escHtml(desc)}</div>
+              <div class="roblox-meta">
+                <span class="roblox-visits">${visits} visits</span>
+              </div>
+            </div>
+          `;
+
+          rbxGrid.appendChild(card);
+          revealObserver.observe(card);
+          card.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+          card.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+        });
+
+      } catch (err) {
+        rbxGrid.innerHTML = `<div class="empty-state reveal" style="grid-column:1/-1"><p>Couldn't load games right now — <a href="https://www.roblox.com/users/${ROBLOX_USER_ID}/profile" target="_blank">view on Roblox</a>.</p></div>`;
+        revealObserver.observe(rbxGrid.firstChild);
+      }
+    }
+
+    loadRobloxGames();
+
+  </script>
+</body>
+</html>
