@@ -742,7 +742,7 @@
     <h2 class="section-title reveal reveal-d1">Games &amp; Videos</h2>
     <div class="content-cards">
       <div class="reveal reveal-d1">
-        <a class="video-card" href="https://www.roblox.com/users/4645504979/profile#!#creations" target="_blank" rel="noopener">
+        <a class="video-card" href="https://www.roblox.com/users/4645504979/profile" target="_blank" rel="noopener">
           <div class="video-icon roblox-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
               <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -841,6 +841,15 @@
 
     // ---- Projects — auto-fetched from GitHub ----
     const GITHUB_USER = 'Nikoti2011';
+
+    // ---- Add non-GitHub projects here! ----
+    // These will appear FIRST before your GitHub repos.
+    // { name, desc, url, tag } — all fields optional except name & url
+    const manualProjects = [
+      // Example (delete or replace):
+      // { name: "The Town Experience", desc: "A Roblox roleplay game I built and maintain.", url: "https://www.roblox.com/games/100299306407024", tag: "Roblox" },
+      { name: "Ai Me", desc: "A Discord bot programmed to act as I was the one talking in your server", url: "https://discord.com/oauth2/authorize?client_id=1468796019863978116&permissions=8&integration_type=0&scope=bot", tag: "Discord" }
+    ];
     // Repos to skip (forks, profile readme, etc.)
     const SKIP_REPOS = [GITHUB_USER.toLowerCase(), `${GITHUB_USER.toLowerCase()}.github.io`];
 
@@ -942,7 +951,13 @@
 
         grid.innerHTML = '';
 
-        if (filtered.length === 0) {
+        // Merge manual + GitHub repos
+        const allProjects = [
+          ...manualProjects.map(p => ({ _manual: true, ...p })),
+          ...filtered
+        ];
+
+        if (allProjects.length === 0) {
           const empty = document.createElement('div');
           empty.className = 'empty-state reveal';
           empty.innerHTML = `<p>No public projects yet — check back soon or visit <a href="https://github.com/${GITHUB_USER}" target="_blank">GitHub</a>.</p>`;
@@ -952,12 +967,36 @@
         }
 
         // Fetch descriptions (with README fallback) in parallel
-        await Promise.all(filtered.map(async (repo, i) => {
+        await Promise.all(allProjects.map(async (item, i) => {
+          if (item._manual) {
+            // Render manual project directly
+            const card = document.createElement('a');
+            card.className = 'project-card reveal';
+            card.style.transitionDelay = (i * 0.09) + 's';
+            card.href = item.url; card.target = '_blank'; card.rel = 'noopener';
+            card.innerHTML = `
+              <div class="project-card-top">
+                <div class="project-icon">
+                  <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </div>
+                <span class="project-arrow">↗</span>
+              </div>
+              <div class="project-name">${escHtml(item.name)}</div>
+              <div class="project-desc">${escHtml(item.desc || '')}</div>
+              ${item.tag ? `<span class="project-tag">${escHtml(item.tag)}</span>` : ''}
+            `;
+            grid.appendChild(card);
+            revealObserver.observe(card);
+            card.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            card.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+            return;
+          }
+          const repo = item;
           const desc = repo.description && repo.description.trim()
             ? repo.description.trim()
             : await fetchReadmeDesc(repo.name);
           renderCard(repo, desc, i);
-        }));
+        })); // end map
 
         // Re-observe newly added cards
         document.querySelectorAll('.project-card.reveal:not(.visible)').forEach(el => revealObserver.observe(el));
