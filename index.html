@@ -599,7 +599,9 @@
     }
     function openEmail() {
       var e = [110,105,107,111,108,97,105,109,101,122,97,64,103,109,97,105,108,46,99,111,109].map(function(c){return String.fromCharCode(c);}).join('');
-      window.location.href = 'mai' + 'lto:' + e;
+      navigator.clipboard.writeText(e).catch(function(){});
+      var tip = document.getElementById('emailTooltip');
+      if (tip) { tip.classList.add('show'); setTimeout(function(){ tip.classList.remove('show'); }, 2200); }
     }
     function copyDiscord() {
       navigator.clipboard.writeText('nikoti2011').catch(() => {});
@@ -655,10 +657,13 @@
         </button>
         <div class="discord-tooltip" id="dcTooltip">nikoti2011 · copied!</div>
       </div>
-      <button class="btn-secondary" onclick="openEmail()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
-        Email
-      </button>
+      <div style="position:relative;">
+        <button class="btn-secondary" onclick="openEmail()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+          Email
+        </button>
+        <div class="discord-tooltip" id="emailTooltip">nikolaimeza@gmail.com · copied!</div>
+      </div>
     </div>
 
     <div class="hero-scroll">
@@ -831,7 +836,9 @@
     // ---- Discord copy ----
     function openEmail() {
       var e = [110,105,107,111,108,97,105,109,101,122,97,64,103,109,97,105,108,46,99,111,109].map(function(c){return String.fromCharCode(c);}).join('');
-      window.location.href = 'mai' + 'lto:' + e;
+      navigator.clipboard.writeText(e).catch(function(){});
+      var tip = document.getElementById('emailTooltip');
+      if (tip) { tip.classList.add('show'); setTimeout(function(){ tip.classList.remove('show'); }, 2200); }
     }
     function copyDiscord() {
       navigator.clipboard.writeText('nikoti2011').catch(() => {});
@@ -858,6 +865,7 @@
     const manualProjects = [
       // Example (delete or replace):
       // { name: "The Town Experience", desc: "A Roblox roleplay game I built and maintain.", url: "https://www.roblox.com/games/100299306407024", tag: "Roblox" },
+      { name: "Ai Me", desc: "A Discord bot that acts like if I was the one talking", url: "https://discord.com/oauth2/authorize?client_id=1468796019863978116&permissions=8&integration_type=0&scope=bot", tag: "Discord" }
     ];
     // Repos to skip (forks, profile readme, etc.)
     const SKIP_REPOS = [GITHUB_USER.toLowerCase(), `${GITHUB_USER.toLowerCase()}.github.io`];
