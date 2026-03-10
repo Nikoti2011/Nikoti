@@ -595,6 +595,11 @@
       const tip = document.getElementById('shareTooltip');
       if (tip) { tip.classList.add('show'); setTimeout(() => tip.classList.remove('show'), 2200); }
     }
+    function openEmail() {
+      const u = 'nikolaimeza';
+      const d = 'gmail.com';
+      window.location.href = 'mailto:' + u + '@' + d;
+    }
     function copyDiscord() {
       navigator.clipboard.writeText('nikoti2011').catch(() => {});
       const tip = document.getElementById('dcTooltip');
@@ -649,10 +654,10 @@
         </button>
         <div class="discord-tooltip" id="dcTooltip">nikoti2011 · copied!</div>
       </div>
-      <a class="btn-secondary" href="/cdn-cgi/l/email-protection#f59b9c9e9a99949c98908f94b59298949c99db969a98">
+      <button class="btn-secondary" onclick="openEmail()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
         Email
-      </a>
+      </button>
     </div>
 
     <div class="hero-scroll">
@@ -791,7 +796,7 @@
       <div class="footer-links">
         <a href="https://github.com/Nikoti2011" target="_blank">GitHub</a>
         <a href="#" onclick="copyDiscord(); return false;">Discord</a>
-        <a href="/cdn-cgi/l/email-protection#3e50575551525f57535b445f7e59535f5752105d5153">Email</a>
+        <a href="#" onclick="openEmail(); return false;">Email</a>
       </div>
     </footer>
   </div>
@@ -823,6 +828,11 @@
     });
 
     // ---- Discord copy ----
+    function openEmail() {
+      const u = 'nikolaimeza';
+      const d = 'gmail.com';
+      window.location.href = 'mailto:' + u + '@' + d;
+    }
     function copyDiscord() {
       navigator.clipboard.writeText('nikoti2011').catch(() => {});
       const tip = document.getElementById('dcTooltip');
@@ -848,7 +858,6 @@
     const manualProjects = [
       // Example (delete or replace):
       // { name: "The Town Experience", desc: "A Roblox roleplay game I built and maintain.", url: "https://www.roblox.com/games/100299306407024", tag: "Roblox" },
-      { name: "Ai Me", desc: "A Discord bot programmed to act as I was the one talking in your server", url: "https://discord.com/oauth2/authorize?client_id=1468796019863978116&permissions=8&integration_type=0&scope=bot", tag: "Discord" }
     ];
     // Repos to skip (forks, profile readme, etc.)
     const SKIP_REPOS = [GITHUB_USER.toLowerCase(), `${GITHUB_USER.toLowerCase()}.github.io`];
